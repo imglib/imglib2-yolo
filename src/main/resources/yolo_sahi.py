@@ -137,7 +137,7 @@ else:
     from sahi.utils.cv import read_image
     import os
     sample_folder = '../../../samples/'
-    source_image  = io.imread(os.path.join(sample_folder, 'test_XY.tif'))
+    source_image  = io.imread(os.path.join(sample_folder, 'cycling001-1024x683.jpg'))
     chan_r, chan_g, chan_b = 1, 2, 0
     conf          = 0.25
     iou           = 0.7
@@ -239,7 +239,7 @@ task.update(
 # ── Return results ────────────────────────────────────────────────────────────
 if appose_mode:
     task.update(message=f"Exporting {len(all_detections)} detections")
-    task.export( detections=all_detections )
+    task.outputs['detections'] = all_detections
 else:
     import json
     print(json.dumps(all_detections, indent=2))
