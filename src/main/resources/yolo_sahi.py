@@ -53,13 +53,14 @@ def predictions_to_table(predictions: list, plane_index: int = 0) -> list[dict]:
     for i, pred in enumerate(predictions, start=1):
         b = pred.bbox
         rows.append({
-            "plane":      plane_index,
             "id":         i,
-            "class_id":   pred.category.id,
+            "class_id":   int(pred.category.id),
             "class_name": pred.category.name,
-            "score":      float(pred.score.value),
-            "x1": float(b.minx), "y1": float(b.miny),
-            "x2": float(b.maxx), "y2": float(b.maxy),
+            "score":      pred.score.value,
+            "x1":         b.minx,
+            "y1":         b.miny,
+            "x2":         b.maxx,
+            "y2":         b.maxy,
         })
     return rows
 
@@ -222,7 +223,7 @@ for plane_idx, plane in enumerate(planes):
     predictions = run_yolo_sahi(rgb, model, kwargs)
     predictions = filter_by_area(predictions, min_area)
 
-    all_detections.extend(predictions_to_table(predictions, plane_index=plane_idx))
+    all_detections.append(predictions_to_table(predictions))
 
     task.update(
         current = plane_idx + 1,
@@ -233,12 +234,12 @@ for plane_idx, plane in enumerate(planes):
 task.update(
     current = n_planes,
     maximum = n_planes,
-    message = f"YOLO+SAHI: Done – {len(all_detections)} total detections"
+    message = f"YOLO+SAHI: Done – {sum(len(p) for p in all_detections)} total detections"
 )
 
 # ── Return results ────────────────────────────────────────────────────────────
 if appose_mode:
-    task.update(message=f"Exporting {len(all_detections)} detections")
+    task.update(message=f"Exporting {len(all_detections)} planes")
     task.outputs['detections'] = all_detections
 else:
     import json

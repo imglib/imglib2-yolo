@@ -85,10 +85,11 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	 * Runs YOLO+SAHI detection on the image currently written in the input
 	 * placeholder.
 	 *
-	 * @return a list of detections, each as a map with keys: {@code plane},
-	 *         {@code id}, {@code class_id}, {@code class_name}, {@code score},
-	 *         {@code x1}, {@code y1}, {@code x2}, {@code y2}. Returns an empty
-	 *         list if no objects were detected.
+	 * @return a list of planes, each plane being a list of detections.
+	 *         Each detection is a map with keys: {@code id}, {@code class_id},
+	 *         {@code class_name}, {@code score}, {@code x1}, {@code y1},
+	 *         {@code x2}, {@code y2}. Returns an empty list if no objects
+	 *         were detected.
 	 * @throws InterruptedException
 	 *             if the thread is interrupted while waiting for the Python
 	 *             script to finish.
@@ -96,7 +97,7 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	 *             if executing the Python script fails.
 	 */
 	@SuppressWarnings( "unchecked" )
-	public List< Map< String, Object > > run() throws InterruptedException, TaskException
+	public List< List< Map< String, Object > > > run() throws InterruptedException, TaskException
 	{
 		final Task task = python.task( yoloScript, inputsParams );
 
@@ -112,11 +113,11 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 		listener.message( "YOLO+SAHI inference done in " + ( end - start ) / 1000. + " s" );
 
 		// Detections are returned via task.export( detections=... ) in Python.
-		// Returns an empty list if the key is absent (no detections).
+		// Returns a list of lists: one list per plane.
 		final Object detections = task.outputs.get( "detections" );
 		if ( detections == null )
 			return Collections.emptyList();
-		return ( List< Map< String, Object > > ) detections;
+		return ( List< List< Map< String, Object > > > ) detections;
 	}
 
 	/**

@@ -72,9 +72,10 @@ public class YOLO
 	 *            the YOLO parameters.
 	 * @param listener
 	 *            receives progress and log messages.
-	 * @return a flat list of detections. Each map contains: {@code plane},
-	 *         {@code id}, {@code class_id}, {@code class_name}, {@code score},
-	 *         {@code x1}, {@code y1}, {@code x2}, {@code y2}.
+	 * @return a list of planes, each plane being a list of detections.
+	 *         Each detection is a map with keys: {@code id}, {@code class_id},
+	 *         {@code class_name}, {@code score}, {@code x1}, {@code y1},
+	 *         {@code x2}, {@code y2}.
 	 * @throws BuildException
 	 *             if building the Python environment fails.
 	 * @throws IOException
@@ -85,7 +86,7 @@ public class YOLO
 	 * @throws TaskException
 	 *             if executing the Python script fails.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > List< Map< String, Object > > detect(
+	public static < T extends RealType< T > & NativeType< T > > List< List< Map< String, Object > > > detect(
 			final RandomAccessibleInterval< T > img,
 			final YOLOParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
@@ -109,7 +110,7 @@ public class YOLO
 		}
 	}
 
-	public static List< Map< String, Object > > detectRGB(
+	public static List< List< Map< String, Object > > > detectRGB(
 			final RandomAccessibleInterval< ARGBType > img,
 			final YOLOParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
