@@ -46,10 +46,10 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	private String yoloScript;
 
 	/**
-	 * Instantiates a YOLO+SAHI runner.
+	 * Instantiates a YOLO-SAHI runner.
 	 *
 	 * @param params
-	 *            the YOLO+SAHI parameters.
+	 *            the YOLO-SAHI parameters.
 	 * @param pythonInitScriptPath
 	 *            classpath resource path to the model init script
 	 *            ({@code yolo_sahi_init.py}).
@@ -83,14 +83,14 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	}
 
 	/**
-	 * Runs YOLO+SAHI detection on the image currently written in the input
+	 * Runs YOLO-SAHI detection on the image currently written in the input
 	 * placeholder.
 	 *
-	 * @return a list of planes, each plane being a list of detections.
-	 *         Each detection is a map with keys: {@code id}, {@code class_id},
+	 * @return a list of planes, each plane being a list of detections. Each
+	 *         detection is a map with keys: {@code id}, {@code class_id},
 	 *         {@code class_name}, {@code score}, {@code x1}, {@code y1},
-	 *         {@code x2}, {@code y2}. Returns an empty list if no objects
-	 *         were detected.
+	 *         {@code x2}, {@code y2}. Returns an empty list if no objects were
+	 *         detected.
 	 * @throws InterruptedException
 	 *             if the thread is interrupted while waiting for the Python
 	 *             script to finish.
@@ -111,7 +111,7 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 			throw new RuntimeException( "Python script failed with error: " + task.error );
 
 		final long end = System.currentTimeMillis();
-		listener.message( "YOLO+SAHI inference done in " + ( end - start ) / 1000. + " s" );
+		listener.message( "YOLO-SAHI inference done in " + ( end - start ) / 1000. + " s" );
 
 		// Detections are returned via task.export( detections=... ) in Python.
 		// Returns a list of lists: one list per plane.
@@ -169,7 +169,7 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 			throw new RuntimeException( "Python init script failed with error: " + task.error );
 
 		final long end = System.currentTimeMillis();
-		listener.message( "YOLO+SAHI initialisation done in " + ( end - start ) / 1000. + " s" );
+		listener.message( "YOLO-SAHI: Initialisation done in " + ( end - start ) / 1000. + " s" );
 
 		// Cache the inference script for repeated run() calls.
 		this.yoloScript = IOUtils.toString(
