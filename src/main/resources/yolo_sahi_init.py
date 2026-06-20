@@ -24,11 +24,7 @@ if appose_mode:
 
 use_gpu, device = get_torch_device(use_gpu)
 
-task.update(
-    current = 1,
-    maximum = 2,
-    message = f"YOLO+SAHI: Loading model '{model_file}' on {device}"
-)
+task.update(message = f"YOLO-SAHI: Loading model '{model_file}' on {device}")
 
 detection_model = AutoDetectionModel.from_pretrained(
     model_type           = 'ultralytics',
@@ -37,11 +33,7 @@ detection_model = AutoDetectionModel.from_pretrained(
     device               = str(device),
 )
 
-task.update(
-    current = 2,
-    maximum = 2,
-    message = "YOLO+SAHI: Model ready"
-)
+task.update(message = "YOLO-SAHI: Model ready")
 
 if appose_mode:
     task.export( model=detection_model )

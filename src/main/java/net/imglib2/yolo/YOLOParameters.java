@@ -22,13 +22,6 @@ public class YOLOParameters
 
     public final int imgsz;
 
-    // ── Channel mapping ───────────────────────────────────────────────────────
-    public final int chanR;
-
-    public final int chanG;
-
-    public final int chanB;
-
     // ── SAHI ──────────────────────────────────────────────────────────────────
     public final boolean useSahi;
 
@@ -59,9 +52,6 @@ public class YOLOParameters
         this.conf                        = b.conf;
         this.iou                         = b.iou;
         this.imgsz                       = b.imgsz;
-        this.chanR                       = b.chanR;
-        this.chanG                       = b.chanG;
-        this.chanB                       = b.chanB;
         this.useSahi                     = b.useSahi;
         this.sliceHeight                 = b.sliceHeight;
         this.sliceWidth                  = b.sliceWidth;
@@ -95,11 +85,6 @@ public class YOLOParameters
         inputs.put( "iou",   iou );
         inputs.put( "imgsz", imgsz );
 
-        // ── Channel mapping ───────────────────────────────────────────────────
-        inputs.put( "chan_r", chanR );
-        inputs.put( "chan_g", chanG );
-        inputs.put( "chan_b", chanB );
-
         // ── SAHI ──────────────────────────────────────────────────────────────
         inputs.put( "use_sahi",                    useSahi );
         inputs.put( "slice_height",                sliceHeight );
@@ -130,9 +115,6 @@ public class YOLOParameters
         private double conf                              = 0.25;
         private double iou                               = 0.7;
         private int    imgsz                             = 640;
-        private int    chanR                             = 1;
-        private int    chanG                             = 2;
-        private int    chanB                             = 0;
         private boolean useSahi                          = true;
         private int    sliceHeight                       = 640;
         private int    sliceWidth                        = 640;
@@ -149,7 +131,6 @@ public class YOLOParameters
         public Builder conf( final double v )                       { conf = v;          return this; }
         public Builder iou( final double v )                        { iou = v;           return this; }
         public Builder imgsz( final int v )                         { imgsz = v;         return this; }
-        public Builder channels( final int r, final int g, final int b )        { chanR=r; chanG=g; chanB=b; return this; }
         public Builder useSahi( final boolean v )                   { useSahi = v;       return this; }
         public Builder sliceSize( final int h, final int w )              { sliceHeight=h; sliceWidth=w; return this; }
         public Builder overlapRatios( final double h, final double w )    { overlapHeightRatio=h; overlapWidthRatio=w; return this; }
