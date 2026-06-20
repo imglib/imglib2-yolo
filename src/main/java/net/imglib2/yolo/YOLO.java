@@ -2,7 +2,6 @@ package net.imglib2.yolo;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apposed.appose.BuildException;
 import org.apposed.appose.TaskException;
@@ -86,7 +85,7 @@ public class YOLO
 	 * @throws TaskException
 	 *             if executing the Python script fails.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > List< List< Map< String, Object > > > detect(
+	public static < T extends RealType< T > & NativeType< T > > List< List< YOLOResult > > detect(
 			final RandomAccessibleInterval< T > img,
 			final YOLOParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
@@ -110,7 +109,7 @@ public class YOLO
 		}
 	}
 
-	public static List< List< Map< String, Object > > > detectRGB(
+	public static List< List< YOLOResult > > detectRGB(
 			final RandomAccessibleInterval< ARGBType > img,
 			final YOLOParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException

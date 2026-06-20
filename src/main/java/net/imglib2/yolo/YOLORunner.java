@@ -3,6 +3,7 @@ package net.imglib2.yolo;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	 *             if executing the Python script fails.
 	 */
 	@SuppressWarnings( "unchecked" )
-	public List< List< Map< String, Object > > > run() throws InterruptedException, TaskException
+	public List< List< YOLOResult > > run() throws InterruptedException, TaskException
 	{
 		final Task task = python.task( yoloScript, inputsParams );
 
@@ -117,7 +118,8 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 		final Object detections = task.outputs.get( "detections" );
 		if ( detections == null )
 			return Collections.emptyList();
-		return ( List< List< Map< String, Object > > > ) detections;
+
+		return convertResults( ( List< List< Map< String, Object > > > ) detections );
 	}
 
 	/**
@@ -192,5 +194,28 @@ public class YOLORunner< T extends RealType< T > & NativeType< T > > implements 
 	{
 		final URL pixiFile = YOLORunner.class.getResource( "/pixi.toml" );
 		return IOUtils.toString( pixiFile, StandardCharsets.UTF_8 );
+	}
+
+	private List< List< YOLOResult > > convertResults( final List< List< Map< String, Object > > > detections )
+	{
+		final List< List< YOLOResult > > results = new ArrayList<>( detections.size() );
+		for ( final List< Map< String, Object > > plane : detections )
+		{
+			final List< YOLOResult > planeResults = new ArrayList<>( plane.size() );
+			for ( final Map< String, Object > detection : plane )
+			{
+				final int id = ( int ) detection.get( "id" );
+				final int classId = ( int ) detection.get( "class_id" );
+				final String className = ( String ) detection.get( "class_name" );
+				final double score = ( ( Number ) detection.get( "score" ) ).doubleValue();
+				final double x1 = (( Number ) detection.get( "x1" )).doubleValue();
+				final double y1 = (( Number ) detection.get( "y1" )).doubleValue();
+				final double x2 = (( Number ) detection.get( "x2" )).doubleValue();
+				final double y2 = (( Number ) detection.get( "y2" )).doubleValue();
+				planeResults.add( new YOLOResult( id, classId, className, score, x1, y1, x2, y2 ) );
+			}
+			results.add( planeResults );
+		}
+		return results;
 	}
 }

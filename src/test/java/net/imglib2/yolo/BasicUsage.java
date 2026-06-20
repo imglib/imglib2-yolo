@@ -3,7 +3,6 @@ package net.imglib2.yolo;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.apposed.appose.BuildException;
 import org.apposed.appose.TaskException;
@@ -53,13 +52,13 @@ public class BasicUsage
 				.useSahi( true )
 				.build();
 
-		final List< List< Map< String, Object > > > output = YOLO.detectRGB( input, params, listener );
-		int totalObjects = output.stream().mapToInt( List::size ).sum();
+		final List< List< YOLOResult > > output = YOLO.detectRGB( input, params, listener );
+		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );
 	}
 
-	private static void showOutput( final List< List< Map< String, Object > > > output, final ImagePlus imp )
+	private static void showOutput( final List< List< YOLOResult > > output, final ImagePlus imp )
 	{
 		// Prep overlay for output
 		Overlay overlay = imp.getOverlay();
@@ -73,32 +72,21 @@ public class BasicUsage
 			overlay.clear();
 		}
 
-		for ( final List< Map< String, Object > > plane : output )
+		for ( final List< YOLOResult > plane : output )
 		{
-			for ( final Map< String, Object > detection : plane )
+			for ( final YOLOResult d : plane )
 			{
-				final double score = ( ( Number ) detection.get( "score" ) ).doubleValue();
-				final int classId = ( int ) detection.get( "class_id" );
-				final int id = ( int ) detection.get( "id" );
-				final double x1 = ( ( Number ) detection.get( "x1" ) ).doubleValue();
-				final double y1 = ( ( Number ) detection.get( "y1" ) ).doubleValue();
-				final double x2 = ( ( Number ) detection.get( "x2" ) ).doubleValue();
-				final double y2 = ( ( Number ) detection.get( "y2" ) ).doubleValue();
-				final String className = ( String ) detection.get( "class_name" );
-
-				final Roi roi = new Roi( x1, y1, x2 - x1, y2 - y1 );
-				roi.setStrokeColor( get( classId ) );
+				final Roi roi = Roi.create( d.x1(), d.y1(), d.width(), d.height() );
+				roi.setStrokeColor( get( d.classId() ) );
 				overlay.add( roi );
 
-				final TextRoi textRoi = new TextRoi( x1, y1 - 20, id + ": " + className + " (" + String.format( "%.2f", score ) + ")" );
+				final TextRoi textRoi = new TextRoi( d.x1(), d.y1() - 20, d.id() + ": " + d.className() + " (" + String.format( "%.2f", d.score() ) + ")" );
 				textRoi.setFillColor( Color.BLACK );
-				textRoi.setStrokeColor( get( classId ) );
+				textRoi.setStrokeColor( get( d.classId() ) );
 				overlay.add( textRoi );
 			}
 		}
-
 		imp.updateAndDraw();
-		System.out.println( "Done." );
 	}
 
 	/**
@@ -107,9 +95,9 @@ public class BasicUsage
 	private static final Color get(  final int n )
 	{
 		// Forbid dark color.
-		final int r = ( ( ( 1 + n ) * 123 ) % 128 ) + 128;
-		final int g = ( ( ( 2 + n ) * 456 ) % 128 ) + 128;
-		final int b = ( ( ( 3 + n ) * 789 ) % 128 ) + 128;
+		final int r = ( ( n * 123 ) % 128 ) + 128;
+		final int g = ( ( n * 456 ) % 128 ) + 128;
+		final int b = ( ( n * 789 ) % 128 ) + 128;
 		return new Color( r, g, b );
 	}
 }
