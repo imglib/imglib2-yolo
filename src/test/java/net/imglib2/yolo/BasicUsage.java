@@ -34,9 +34,12 @@ public class BasicUsage
 
 	public static void basicUsage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
+		final String sampleImagePath = "samples/coco128/images/train2017/000000000074.jpg";
+//		String sampleImagePath = "samples/cycling001-1024x683.jpg";
+
 		// Demo preparation. We use IJ for this one.
 		ImageJ.main( args );
-		final ImagePlus imp = IJ.openImage( "samples/cycling001-1024x683.jpg" );
+		final ImagePlus imp = IJ.openImage( sampleImagePath );
 		imp.show();
 		final Img< ARGBType > img = ImageJFunctions.wrap( imp );
 
@@ -58,7 +61,7 @@ public class BasicUsage
 		showOutput( output, imp );
 	}
 
-	private static void showOutput( final List< List< YOLOResult > > output, final ImagePlus imp )
+	static void showOutput( final List< List< YOLOResult > > output, final ImagePlus imp )
 	{
 		// Prep overlay for output
 		Overlay overlay = imp.getOverlay();
@@ -72,16 +75,19 @@ public class BasicUsage
 			overlay.clear();
 		}
 
-		for ( final List< YOLOResult > plane : output )
+		for ( int i = 0; i < output.size(); i++ )
 		{
+			final List< YOLOResult > plane = output.get( i );
 			for ( final YOLOResult d : plane )
 			{
 				final Roi roi = Roi.create( d.x1(), d.y1(), d.width(), d.height() );
 				roi.setStrokeColor( get( d.classId() ) );
+				roi.setPosition( i + 1 );
 				overlay.add( roi );
 
 				final TextRoi textRoi = new TextRoi( d.x1(), d.y1() - 20, d.id() + ": " + d.className() + " (" + String.format( "%.2f", d.score() ) + ")" );
 				textRoi.setFillColor( Color.BLACK );
+				textRoi.setPosition( i + 1 );
 				textRoi.setStrokeColor( get( d.classId() ) );
 				overlay.add( textRoi );
 			}
