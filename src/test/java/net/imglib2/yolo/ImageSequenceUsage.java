@@ -28,7 +28,7 @@ public class ImageSequenceUsage
 
 			// Specify the parameters for YOLO
 			final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-					.builtinModel( YOLOBuiltinModels.YOLO11L )
+					.builtinModel( YOLOBuiltinModels.YOLO26L )
 					.useSahi( false )
 					.build();
 
