@@ -102,8 +102,6 @@ else:
 if appose_mode:
 	source_image  = globals()['input'].ndarray()
 	conf: float   = globals()['conf']
-	iou: float    = globals()['iou']
-	imgsz: int    = globals()['imgsz']
 	use_sahi: bool                  = globals()['use_sahi']
 	slice_height: int               = globals()['slice_height']
 	slice_width: int                = globals()['slice_width']
@@ -120,8 +118,6 @@ else:
 	sample_folder = '../../../samples/'
 	source_image  = io.imread(os.path.join(sample_folder, 'cycling001-1024x683.jpg'))
 	conf          = 0.25
-	iou           = 0.7
-	imgsz         = 640
 	use_sahi      = True
 	slice_height  = 640
 	slice_width   = 640
@@ -150,8 +146,6 @@ task.update(message=f"{msg_prefix}Input image shape {source_image.shape}")
 
 kwargs = dict(
 	conf                        = conf,
-	iou                         = iou,
-	imgsz                       = imgsz,
 	use_sahi                    = use_sahi,
 	slice_height                = slice_height,
 	slice_width                 = slice_width,
