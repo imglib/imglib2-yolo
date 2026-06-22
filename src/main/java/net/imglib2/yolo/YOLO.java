@@ -60,6 +60,28 @@ public class YOLO
 	}
 
 	/**
+	 * Converts a single-channel image to a 3-channel RGB stack by duplicating
+	 * the channel three times. The channel axis is appended as the last
+	 * dimension.
+	 * <p>
+	 * The input image should already be in the 0-255 range. For 16-bit or
+	 * 32-bit images, rescale before calling this method.
+	 *
+	 * @param singleChannel
+	 *            the input single-channel image.
+	 * @return a read-only view with 3 UnsignedByteType channels.
+	 */
+	public static < T extends RealType< T > > RandomAccessibleInterval< UnsignedByteType > singleChannelToRGBStack( final RandomAccessibleInterval< T > singleChannel )
+	{
+		// Convert to 8-bit and clamps to 0-255
+		final RandomAccessibleInterval< UnsignedByteType > converted = Converters.convert(
+				singleChannel,
+				( in, out ) -> out.set( ( int ) Math.round( in.getRealDouble() ) ),
+				new UnsignedByteType() );
+		return Views.stack( converted, converted, converted );
+	}
+
+	/**
 	 * Runs YOLO-SAHI detection on the given image and returns all detections.
 	 * This method is suitable for image made of scalar pixel types, not RGB
 	 * ones (ARGB type).
@@ -93,8 +115,8 @@ public class YOLO
 			throw new IllegalArgumentException( "Input image must be scalar for non-RGB detection. Got " + ( ( Typed< ? > ) img ).getType().getClass().getSimpleName() );
 
 		final String envName = getEnvName( params.useGpu );
-		try (final ShmImg< T > input = ShmImg.copyOf( img );
-				YOLOSAHIRunner< T > runner = new YOLOSAHIRunner<>(
+		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( singleChannelToRGBStack( img ) );
+				YOLOSAHIRunner runner = new YOLOSAHIRunner(
 				params,
 				envName,
 				listener,
@@ -138,7 +160,7 @@ public class YOLO
 
 		final String envName = getEnvName( params.useGpu );
 		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( argbToRGBStack( img ) );
-				YOLOSAHIRunner< UnsignedByteType > runner = new YOLOSAHIRunner<>(
+				YOLOSAHIRunner runner = new YOLOSAHIRunner(
 						params,
 						envName,
 						listener,
@@ -165,18 +187,25 @@ public class YOLO
 	 * @param listener
 	 *            receives progress and log messages.
 	 * @param input
-	 *            shared-memory placeholder for the input image.
+	 *            shared-memory placeholder for the input image. Because YOLO
+	 *            only works on RGB images, and because we can only pass scalar
+	 *            images via shared memory, this must be a 3-channel, 8-bit
+	 *            image where the planes represent the R, G and B channels. So
+	 *            we expect the input to be [W, H, 3] with UnsignedByteType
+	 *            pixels for single images or [N, W, H, 3] for a stack of N
+	 *            images. Everything else will fail with an exception at the
+	 *            Python level.
 	 * @return a {@link YOLOSAHIRunner} ready to call
 	 *         {@link YOLOSAHIRunner#init()} and then
 	 *         {@link YOLOSAHIRunner#run()}.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > YOLOSAHIRunner< T > yoloSAHIRunner(
+	public static YOLOSAHIRunner yoloSAHIRunner(
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener,
-			final ShmImg< T > input )
+			final ShmImg< UnsignedByteType > input )
 	{
 		final String envName = getEnvName( params.useGpu );
-		return new YOLOSAHIRunner<>(
+		return new YOLOSAHIRunner(
 				params,
 				envName,
 				listener,

@@ -18,13 +18,12 @@ import org.apposed.appose.Service.TaskStatus;
 import org.apposed.appose.TaskException;
 
 import net.imglib2.appose.ShmImg;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.RealType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
- * Runs YOLO detection with optional SAHI slicing via Appose.
+ * Runs YOLO detection with SAHI slicing via Appose.
  */
-public class YOLOSAHIRunner< T extends RealType< T > & NativeType< T > > implements AutoCloseable
+public class YOLOSAHIRunner implements AutoCloseable
 {
 
 	private static final String INIT_SCRIPT_PATH = "/yolo_sahi_init.py";
@@ -56,13 +55,19 @@ public class YOLOSAHIRunner< T extends RealType< T > & NativeType< T > > impleme
 	 * @param listener
 	 *            receives progress and log messages.
 	 * @param input
-	 *            input image.
+	 *            input image placehoder. Because YOLO only works on RGB images,
+	 *            and because we can only pass scalar images via shared memory,
+	 *            this must be a 3-channel, 8-bit image where the planes
+	 *            represent the R, G and B channels. So we expect the input to
+	 *            be [W, H, 3] with UnsignedByteType pixels for single images or
+	 *            [N, W, H, 3] for a stack of N images. Everything else will
+	 *            fail with an exception at the Python level.
 	 */
 	YOLOSAHIRunner(
 			final YOLOSAHIParameters params,
 			final String envName,
 			final ApposeTaskListener listener,
-			final ShmImg< T > input )
+			final ShmImg< UnsignedByteType > input )
 	{
 		this.envName = envName;
 		this.listener = listener;
