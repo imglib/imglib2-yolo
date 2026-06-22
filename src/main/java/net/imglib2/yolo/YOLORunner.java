@@ -23,10 +23,6 @@ import net.imglib2.type.numeric.RealType;
 
 /**
  * Runs YOLO detection with optional SAHI slicing via Appose.
- * <p>
- * Detections are returned as a list of maps from {@link #run()}, each map
- * containing: {@code plane}, {@code id}, {@code class_id}, {@code class_name},
- * {@code score}, {@code x1}, {@code y1}, {@code x2}, {@code y2}.
  */
 public class YOLORunner< T extends RealType< T > & NativeType< T > > implements AutoCloseable
 {

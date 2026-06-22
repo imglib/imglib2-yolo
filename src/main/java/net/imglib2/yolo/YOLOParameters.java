@@ -18,10 +18,6 @@ public class YOLOParameters
     // ── Core inference ────────────────────────────────────────────────────────
     public final double conf;
 
-    public final double iou;
-
-    public final int imgsz;
-
     // ── SAHI ──────────────────────────────────────────────────────────────────
     public final boolean useSahi;
 
@@ -50,8 +46,6 @@ public class YOLOParameters
         this.builtinModel                = b.builtinModel;
         this.customModel                 = b.customModel;
         this.conf                        = b.conf;
-        this.iou                         = b.iou;
-        this.imgsz                       = b.imgsz;
         this.useSahi                     = b.useSahi;
         this.sliceHeight                 = b.sliceHeight;
         this.sliceWidth                  = b.sliceWidth;
@@ -82,8 +76,6 @@ public class YOLOParameters
 
         // ── Core inference ────────────────────────────────────────────────────
         inputs.put( "conf",  conf );
-        inputs.put( "iou",   iou );
-        inputs.put( "imgsz", imgsz );
 
         // ── SAHI ──────────────────────────────────────────────────────────────
         inputs.put( "use_sahi",                    useSahi );
@@ -113,8 +105,6 @@ public class YOLOParameters
         private YOLOBuiltinModels builtinModel          = YOLOBuiltinModels.YOLO11M;
         private String customModel                       = null;
         private double conf                              = 0.25;
-        private double iou                               = 0.7;
-        private int    imgsz                             = 640;
         private boolean useSahi                          = true;
         private int    sliceHeight                       = 640;
         private int    sliceWidth                        = 640;
@@ -129,8 +119,6 @@ public class YOLOParameters
         public Builder builtinModel( final YOLOBuiltinModels m )    { builtinModel = m;  return this; }
         public Builder customModel( final String p )                { customModel = p;   return this; }
         public Builder conf( final double v )                       { conf = v;          return this; }
-        public Builder iou( final double v )                        { iou = v;           return this; }
-        public Builder imgsz( final int v )                         { imgsz = v;         return this; }
         public Builder useSahi( final boolean v )                   { useSahi = v;       return this; }
         public Builder sliceSize( final int h, final int w )              { sliceHeight=h; sliceWidth=w; return this; }
         public Builder overlapRatios( final double h, final double w )    { overlapHeightRatio=h; overlapWidthRatio=w; return this; }
