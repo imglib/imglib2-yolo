@@ -98,8 +98,6 @@ public class YOLO
 		try (final ShmImg< T > input = ShmImg.copyOf( img );
 				YOLOSAHIRunner< T > runner = new YOLOSAHIRunner<>(
 				params,
-				"/yolo_sahi_init.py",
-				"/yolo_sahi.py",
 				envName,
 				listener,
 				input ))
@@ -122,8 +120,6 @@ public class YOLO
 		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( argbToRGBStack( img ) );
 				YOLOSAHIRunner< UnsignedByteType > runner = new YOLOSAHIRunner<>(
 						params,
-						"/yolo_sahi_init.py",
-						"/yolo_sahi.py",
 						envName,
 						listener,
 						input ))
@@ -161,8 +157,6 @@ public class YOLO
 		final String envName = getEnvName( params.useGpu );
 		return new YOLOSAHIRunner<>(
 				params,
-				"/yolo_sahi_init.py",
-				"/yolo_sahi.py",
 				envName,
 				listener,
 				input );
