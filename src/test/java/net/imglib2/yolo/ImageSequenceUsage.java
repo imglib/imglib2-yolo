@@ -32,7 +32,7 @@ public class ImageSequenceUsage
 					.useSahi( false )
 					.build();
 
-			final List< List< YOLOResult > > output = YOLO.detectRGB( img, params, listener );
+			final List< List< YOLOResult > > output = YOLO.sahiDetectRGB( img, params, listener );
 			final int totalObjects = output.stream().mapToInt( List::size ).sum();
 			System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 			BasicUsage.showOutput( output, stack );

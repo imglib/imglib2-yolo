@@ -55,7 +55,7 @@ public class BasicUsage
 				.useSahi( true )
 				.build();
 
-		final List< List< YOLOResult > > output = YOLO.detectRGB( input, params, listener );
+		final List< List< YOLOResult > > output = YOLO.sahiDetectRGB( input, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

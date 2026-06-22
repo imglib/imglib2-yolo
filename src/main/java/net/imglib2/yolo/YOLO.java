@@ -7,6 +7,7 @@ import org.apposed.appose.BuildException;
 import org.apposed.appose.TaskException;
 
 import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.Typed;
 import net.imglib2.appose.ShmImg;
 import net.imglib2.converter.Converters;
 import net.imglib2.type.NativeType;
@@ -59,22 +60,19 @@ public class YOLO
 	}
 
 	/**
-	 * Runs YOLO detection on the given image and returns all detections. This
-	 * method is suitable for image made of scalar pixel types, not RGB ones
-	 * (ARGB type).
+	 * Runs YOLO-SAHI detection on the given image and returns all detections.
+	 * This method is suitable for image made of scalar pixel types, not RGB
+	 * ones (ARGB type).
 	 *
 	 * @param <T>
 	 *            the pixel type of the input image. Must be scalar.
 	 * @param img
 	 *            the input image.
 	 * @param params
-	 *            the YOLO parameters.
+	 *            the YOLO-SAHI parameters.
 	 * @param listener
 	 *            receives progress and log messages.
-	 * @return a list of planes, each plane being a list of detections.
-	 *         Each detection is a map with keys: {@code id}, {@code class_id},
-	 *         {@code class_name}, {@code score}, {@code x1}, {@code y1},
-	 *         {@code x2}, {@code y2}.
+	 * @return a list of list of detections. One list per plane.
 	 * @throws BuildException
 	 *             if building the Python environment fails.
 	 * @throws IOException
@@ -85,14 +83,14 @@ public class YOLO
 	 * @throws TaskException
 	 *             if executing the Python script fails.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > List< List< YOLOResult > > detect(
+	public static < T extends RealType< T > & NativeType< T > > List< List< YOLOResult > > sahiDetect(
 			final RandomAccessibleInterval< T > img,
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
 		// Test if the image is truly scalar
 		if ( img.getType() instanceof ARGBType )
-			throw new IllegalArgumentException( "Input image must be scalar for non-RGB detection. Got " + img.getType() );
+			throw new IllegalArgumentException( "Input image must be scalar for non-RGB detection. Got " + ( ( Typed< ? > ) img ).getType().getClass().getSimpleName() );
 
 		final String envName = getEnvName( params.useGpu );
 		try (final ShmImg< T > input = ShmImg.copyOf( img );
@@ -107,14 +105,36 @@ public class YOLO
 		}
 	}
 
-	public static List< List< YOLOResult > > detectRGB(
+	/**
+	 * Runs YOLO-SAHI detection on the given RGB image and returns all
+	 * detections. This method is suitable for images made of ARGBType pixels,
+	 * not scalar ones.
+	 * 
+	 * @param img
+	 *            the input RGB image (ARGBType).
+	 * @param params
+	 *            the YOLO-SAHI parameters.
+	 * @param listener
+	 *            receives progress and log messages.
+	 * @return a list of list of detections. One list per plane.
+	 * @throws BuildException
+	 *             if building the Python environment fails.
+	 * @throws IOException
+	 *             if reading the Python scripts or environment specification
+	 *             fails.
+	 * @throws InterruptedException
+	 *             if the Python process is interrupted.
+	 * @throws TaskException
+	 *             if executing the Python script fails.
+	 */
+	public static List< List< YOLOResult > > sahiDetectRGB(
 			final RandomAccessibleInterval< ARGBType > img,
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
 		// Test if the image is truly RGB
 		if ( img.getType() instanceof ARGBType == false )
-			throw new IllegalArgumentException( "Input image must be of type ARGBType for RGB detection. Got " + img.getType() );
+			throw new IllegalArgumentException( "Input image must be of type ARGBType for RGB detection. Got " + ( ( Typed< ? > ) img ).getType().getClass().getSimpleName() );
 
 		final String envName = getEnvName( params.useGpu );
 		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( argbToRGBStack( img ) );
@@ -134,22 +154,23 @@ public class YOLO
 	 * parameters and shared-memory placeholder.
 	 * <p>
 	 * Useful when processing many images with the same parameters, as the
-	 * Python environment and model are initialised only once. Write new input
+	 * Python environment and model are initialized only once. Write new input
 	 * data into the returned {@code input} ShmImg, then call
-	 * {@link YoloSahiRunner#run()} to get the detections.
+	 * {@link YOLOSAHIParameters#run()} to get the detections.
 	 *
 	 * @param <T>
 	 *            the pixel type of the input image.
 	 * @param params
-	 *            the YOLO parameters.
+	 *            the YOLO-SAHI parameters.
 	 * @param listener
 	 *            receives progress and log messages.
 	 * @param input
 	 *            shared-memory placeholder for the input image.
-	 * @return a {@link YOLO} ready to call {@link YOLO#init()} and then
-	 *         {@link YOLO#run()}.
+	 * @return a {@link YOLOSAHIRunner} ready to call
+	 *         {@link YOLOSAHIRunner#init()} and then
+	 *         {@link YOLOSAHIRunner#run()}.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > YOLOSAHIRunner< T > yoloRunner(
+	public static < T extends RealType< T > & NativeType< T > > YOLOSAHIRunner< T > yoloSAHIRunner(
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener,
 			final ShmImg< T > input )
