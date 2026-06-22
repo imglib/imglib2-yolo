@@ -29,12 +29,6 @@ public class YOLOSAHIParameters
 
     public final double overlapWidthRatio;
 
-    public final boolean performStandardPred;
-
-    public final String postprocessType;
-
-    public final double postprocessMatchThreshold;
-
     // ── Advanced ──────────────────────────────────────────────────────────────
     public final int minArea;
 
@@ -51,9 +45,6 @@ public class YOLOSAHIParameters
         this.sliceWidth                  = b.sliceWidth;
         this.overlapHeightRatio          = b.overlapHeightRatio;
         this.overlapWidthRatio           = b.overlapWidthRatio;
-        this.performStandardPred         = b.performStandardPred;
-        this.postprocessType             = b.postprocessType;
-        this.postprocessMatchThreshold   = b.postprocessMatchThreshold;
         this.minArea                     = b.minArea;
         this.useGpu                      = b.useGpu;
     }
@@ -83,9 +74,6 @@ public class YOLOSAHIParameters
         inputs.put( "slice_width",                 sliceWidth );
         inputs.put( "overlap_height_ratio",        overlapHeightRatio );
         inputs.put( "overlap_width_ratio",         overlapWidthRatio );
-        inputs.put( "perform_standard_pred",       performStandardPred );
-        inputs.put( "postprocess_type",            postprocessType );
-        inputs.put( "postprocess_match_threshold", postprocessMatchThreshold );
 
         // ── Advanced ──────────────────────────────────────────────────────────
         inputs.put( "min_area", minArea );
@@ -110,9 +98,6 @@ public class YOLOSAHIParameters
         private int    sliceWidth                        = 640;
         private double overlapHeightRatio                = 0.2;
         private double overlapWidthRatio                 = 0.2;
-        private boolean performStandardPred              = true;
-        private String postprocessType                   = "NMS";
-        private double postprocessMatchThreshold         = 0.5;
         private int    minArea                           = 0;
         private boolean useGpu                           = true;
 
@@ -122,9 +107,6 @@ public class YOLOSAHIParameters
         public Builder useSahi( final boolean v )                   { useSahi = v;       return this; }
         public Builder sliceSize( final int h, final int w )              { sliceHeight=h; sliceWidth=w; return this; }
         public Builder overlapRatios( final double h, final double w )    { overlapHeightRatio=h; overlapWidthRatio=w; return this; }
-        public Builder performStandardPred( final boolean v )       { performStandardPred = v; return this; }
-        public Builder postprocessType( final String v )            { postprocessType = v; return this; }
-        public Builder postprocessMatchThreshold( final double v )  { postprocessMatchThreshold = v; return this; }
         public Builder minArea( final int v )                       { minArea = v;       return this; }
         public Builder useGpu( final boolean v )                    { useGpu = v;        return this; }
 

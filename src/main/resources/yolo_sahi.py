@@ -59,10 +59,6 @@ def run_yolo_sahi(stack: np.ndarray, model, kwargs: dict) -> list:
 				slice_width                 = kwargs['slice_width'],
 				overlap_height_ratio        = kwargs['overlap_height_ratio'],
 				overlap_width_ratio         = kwargs['overlap_width_ratio'],
-				perform_standard_pred       = kwargs['perform_standard_pred'],
-				postprocess_type            = kwargs['postprocess_type'],
-				postprocess_match_threshold = kwargs['postprocess_match_threshold'],
-				postprocess_match_metric    = 'IOU',
 				verbose                     = 0,
 			)
 			results.append(predictions_to_table(result.object_prediction_list))
@@ -107,9 +103,6 @@ if appose_mode:
 	slice_width: int                = globals()['slice_width']
 	overlap_height_ratio: float     = globals()['overlap_height_ratio']
 	overlap_width_ratio: float      = globals()['overlap_width_ratio']
-	perform_standard_pred: bool     = globals()['perform_standard_pred']
-	postprocess_type: str           = globals()['postprocess_type']
-	postprocess_match_threshold: float = globals()['postprocess_match_threshold']
 	min_area: int                   = globals()['min_area']
 	use_gpu: bool                   = globals()['use_gpu']
 else:
@@ -123,9 +116,6 @@ else:
 	slice_width   = 640
 	overlap_height_ratio  = 0.2
 	overlap_width_ratio   = 0.2
-	perform_standard_pred = True
-	postprocess_type      = 'NMW'
-	postprocess_match_threshold = 0.5
 	min_area      = 0
 	use_gpu       = False
 
@@ -151,9 +141,6 @@ kwargs = dict(
 	slice_width                 = slice_width,
 	overlap_height_ratio        = overlap_height_ratio,
 	overlap_width_ratio         = overlap_width_ratio,
-	perform_standard_pred       = perform_standard_pred,
-	postprocess_type            = postprocess_type,
-	postprocess_match_threshold = postprocess_match_threshold,
 )
 
 # Only 1 plane -> ndims is 3, otherwise 4 [3, N, H, W]
