@@ -102,7 +102,7 @@ public class YOLOSAHIParameters
 
     public static class Builder
     {
-        private YOLOBuiltinModels builtinModel          = YOLOBuiltinModels.YOLO11M;
+        private YOLOBuiltinModels builtinModel           = YOLOBuiltinModels.YOLO26L;
         private String customModel                       = null;
         private double conf                              = 0.25;
         private boolean useSahi                          = true;

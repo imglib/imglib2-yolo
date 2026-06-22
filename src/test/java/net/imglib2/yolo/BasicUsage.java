@@ -51,7 +51,7 @@ public class BasicUsage
 
 		// Specify the parameters for YOLO
 		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-				.builtinModel( YOLOBuiltinModels.YOLO26N )
+				.builtinModel( YOLOBuiltinModels.YOLO26L )
 				.useSahi( true )
 				.build();
 
