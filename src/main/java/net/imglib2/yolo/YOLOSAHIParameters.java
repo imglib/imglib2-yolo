@@ -7,7 +7,7 @@ import net.imglib2.appose.ShmImg;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 
-public class YOLOParameters
+public class YOLOSAHIParameters
 {
 
     // ── Model ─────────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ public class YOLOParameters
     // ── GPU ───────────────────────────────────────────────────────────────────
     public final boolean useGpu;
 
-    private YOLOParameters( final Builder b )
+    private YOLOSAHIParameters( final Builder b )
     {
         this.builtinModel                = b.builtinModel;
         this.customModel                 = b.customModel;
@@ -128,6 +128,6 @@ public class YOLOParameters
         public Builder minArea( final int v )                       { minArea = v;       return this; }
         public Builder useGpu( final boolean v )                    { useGpu = v;        return this; }
 
-        public YOLOParameters build()                     { return new YOLOParameters( this ); }
+        public YOLOSAHIParameters build()                     { return new YOLOSAHIParameters( this ); }
     }
 }

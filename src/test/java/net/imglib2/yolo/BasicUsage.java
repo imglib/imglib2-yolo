@@ -50,7 +50,7 @@ public class BasicUsage
 		final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 		// Specify the parameters for YOLO
-		final YOLOParameters params = YOLOParameters.builder()
+		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
 				.builtinModel( YOLOBuiltinModels.YOLO26N )
 				.useSahi( true )
 				.build();

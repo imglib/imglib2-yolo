@@ -27,7 +27,7 @@ public class ImageSequenceUsage
 			final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 			// Specify the parameters for YOLO
-			final YOLOParameters params = YOLOParameters.builder()
+			final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
 					.builtinModel( YOLOBuiltinModels.YOLO11L )
 					.useSahi( false )
 					.build();

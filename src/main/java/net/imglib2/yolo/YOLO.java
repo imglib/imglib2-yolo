@@ -87,7 +87,7 @@ public class YOLO
 	 */
 	public static < T extends RealType< T > & NativeType< T > > List< List< YOLOResult > > detect(
 			final RandomAccessibleInterval< T > img,
-			final YOLOParameters params,
+			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
 		// Test if the image is truly scalar
@@ -96,7 +96,7 @@ public class YOLO
 
 		final String envName = getEnvName( params.useGpu );
 		try (final ShmImg< T > input = ShmImg.copyOf( img );
-				YOLORunner< T > runner = new YOLORunner<>(
+				YOLOSAHIRunner< T > runner = new YOLOSAHIRunner<>(
 				params,
 				"/yolo_sahi_init.py",
 				"/yolo_sahi.py",
@@ -111,7 +111,7 @@ public class YOLO
 
 	public static List< List< YOLOResult > > detectRGB(
 			final RandomAccessibleInterval< ARGBType > img,
-			final YOLOParameters params,
+			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
 		// Test if the image is truly RGB
@@ -120,7 +120,7 @@ public class YOLO
 
 		final String envName = getEnvName( params.useGpu );
 		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( argbToRGBStack( img ) );
-				YOLORunner< UnsignedByteType > runner = new YOLORunner<>(
+				YOLOSAHIRunner< UnsignedByteType > runner = new YOLOSAHIRunner<>(
 						params,
 						"/yolo_sahi_init.py",
 						"/yolo_sahi.py",
@@ -153,13 +153,13 @@ public class YOLO
 	 * @return a {@link YOLO} ready to call {@link YOLO#init()} and then
 	 *         {@link YOLO#run()}.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > YOLORunner< T > yoloRunner(
-			final YOLOParameters params,
+	public static < T extends RealType< T > & NativeType< T > > YOLOSAHIRunner< T > yoloRunner(
+			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener,
 			final ShmImg< T > input )
 	{
 		final String envName = getEnvName( params.useGpu );
-		return new YOLORunner<>(
+		return new YOLOSAHIRunner<>(
 				params,
 				"/yolo_sahi_init.py",
 				"/yolo_sahi.py",
