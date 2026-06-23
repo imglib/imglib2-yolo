@@ -1,9 +1,12 @@
 package net.imglib2.yolo;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.Converters;
+import net.imglib2.iterator.IntervalIterator;
 import net.imglib2.loops.LoopBuilder;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.RealType;
@@ -15,6 +18,50 @@ import net.imglib2.view.Views;
  */
 public class YOLOImgUtils
 {
+
+	/**
+	 * Flattens a multi-dimensional image into a flat stack of 2D slices: [N, W,
+	 * H].
+	 */
+	public static < T > RandomAccessibleInterval< T > flatten( final RandomAccessibleInterval< T > img )
+	{
+
+		final int n = img.numDimensions();
+
+		if ( n < 2 )
+			throw new IllegalArgumentException( "Image must have at least 2 dimensions. Got: " + n );
+
+		if ( n == 2 )
+			return img;
+
+		final long[] dims = new long[ n ];
+		img.dimensions( dims );
+
+		// Store individual view of slices
+		final List< RandomAccessibleInterval< T > > result = new ArrayList<>();
+
+		// Create an interval covering the dimensions to iterate over (all except last two).
+		final long[] extraDims = new long[ n - 2 ];
+		System.arraycopy( dims, 0, extraDims, 0, n - 2 );
+
+		// What we will iterator over.
+		final FinalInterval posInterval = FinalInterval.createMinSize( new long[ n - 2 ], extraDims );
+
+		// Iterate over all slices.
+		final IntervalIterator it = IntervalIterator.create( posInterval );
+		while ( it.hasNext() )
+		{
+			it.fwd();
+			// Do hyperslicing n -> n-1 dim
+			RandomAccessibleInterval< T > slice = img;
+			for ( int d = 0; d < n - 2; d++ )
+				slice = Views.hyperSlice( slice, d, it.getLongPosition( d ) );
+
+			result.add( slice );
+		}
+		// Stack.
+		return Views.stack( result );
+	}
 
 	/**
 	 * Converts an ARGBType image to a 3-channel UnsignedByteType view by
