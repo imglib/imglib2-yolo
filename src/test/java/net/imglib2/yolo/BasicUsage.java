@@ -17,6 +17,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.ARGBType;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 public class BasicUsage
 {
@@ -55,7 +56,8 @@ public class BasicUsage
 				.useSahi( true )
 				.build();
 
-		final List< List< YOLOResult > > output = YOLO.sahiDetectRGB( input, params, listener );
+		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
+		final List< List< YOLOResult > > output = YOLO.sahiDetect( rgb, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

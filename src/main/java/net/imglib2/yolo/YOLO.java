@@ -1,8 +1,5 @@
 package net.imglib2.yolo;
 
-import static net.imglib2.yolo.YOLOImgUtils.argbToRGBStack;
-import static net.imglib2.yolo.YOLOImgUtils.singleChannelToRGBStack;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -10,11 +7,7 @@ import org.apposed.appose.BuildException;
 import org.apposed.appose.TaskException;
 
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.Typed;
 import net.imglib2.appose.ShmImg;
-import net.imglib2.type.NativeType;
-import net.imglib2.type.numeric.ARGBType;
-import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
@@ -26,12 +19,18 @@ public class YOLO
 {
 
 	/**
-	 * Runs YOLO-SAHI detection on the given image and returns all detections.
-	 * This method is suitable for image made of scalar pixel types, not RGB
-	 * ones (ARGB type).
-	 *
-	 * @param <T>
-	 *            the pixel type of the input image. Must be scalar.
+	 * Runs YOLO-SAHI detection on the given RGB image, passed as a 3x 8-bit
+	 * channels, and returns all detections.
+	 * <p>
+	 * YOLO only accepts RGB images, and we have to pass them as 3-channel
+	 * UnsignedByteType images with Appose. In addition, the channel dimension
+	 * must be the last one. So we accept:
+	 * <ul>
+	 * <li>single 2D images: [W, H, 3] UnsignedByteType</li>
+	 * <li>multiple 2D images (stacks): [N, W, H, 3] UnsignedByteType</li>
+	 * <ul>
+	 * If you have more dimensions than this, flatten them first.
+	 * 
 	 * @param img
 	 *            the input image.
 	 * @param params
@@ -39,6 +38,8 @@ public class YOLO
 	 * @param listener
 	 *            receives progress and log messages.
 	 * @return a list of list of detections. One list per plane.
+	 * @see YOLOImgUtils YOLOImgUtils - methods to convert input images to the
+	 *      required format.
 	 * @throws BuildException
 	 *             if building the Python environment fails.
 	 * @throws IOException
@@ -49,61 +50,18 @@ public class YOLO
 	 * @throws TaskException
 	 *             if executing the Python script fails.
 	 */
-	public static < T extends RealType< T > & NativeType< T > > List< List< YOLOResult > > sahiDetect(
-			final RandomAccessibleInterval< T > img,
+	public static List< List< YOLOResult > > sahiDetect(
+			final RandomAccessibleInterval< UnsignedByteType > img,
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
-		// Test if the image is truly scalar
-		if ( img.getType() instanceof ARGBType )
-			throw new IllegalArgumentException( "Input image must be scalar for non-RGB detection. Got " + ( ( Typed< ? > ) img ).getType().getClass().getSimpleName() );
+		if ( img.numDimensions() > 4 || img.numDimensions() < 3 )
+			throw new IllegalArgumentException( "The input image must have at least 3 dimensions." );
+		if ( img.dimension( img.numDimensions() - 1 ) != 3 )
+			throw new IllegalArgumentException( "The last dimension of the input image must be [W, H, 3] or [N, W, H, 3]." );
 
 		final String envName = getEnvName( params.useGpu );
-		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( singleChannelToRGBStack( img ) );
-				YOLOSAHIRunner runner = new YOLOSAHIRunner(
-				params,
-				envName,
-				listener,
-				input ))
-		{
-			runner.init();
-			return runner.run();
-		}
-	}
-
-	/**
-	 * Runs YOLO-SAHI detection on the given RGB image and returns all
-	 * detections. This method is suitable for images made of ARGBType pixels,
-	 * not scalar ones.
-	 * 
-	 * @param img
-	 *            the input RGB image (ARGBType).
-	 * @param params
-	 *            the YOLO-SAHI parameters.
-	 * @param listener
-	 *            receives progress and log messages.
-	 * @return a list of list of detections. One list per plane.
-	 * @throws BuildException
-	 *             if building the Python environment fails.
-	 * @throws IOException
-	 *             if reading the Python scripts or environment specification
-	 *             fails.
-	 * @throws InterruptedException
-	 *             if the Python process is interrupted.
-	 * @throws TaskException
-	 *             if executing the Python script fails.
-	 */
-	public static List< List< YOLOResult > > sahiDetectRGB(
-			final RandomAccessibleInterval< ARGBType > img,
-			final YOLOSAHIParameters params,
-			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
-	{
-		// Test if the image is truly RGB
-		if ( img.getType() instanceof ARGBType == false )
-			throw new IllegalArgumentException( "Input image must be of type ARGBType for RGB detection. Got " + ( ( Typed< ? > ) img ).getType().getClass().getSimpleName() );
-
-		final String envName = getEnvName( params.useGpu );
-		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( argbToRGBStack( img ) );
+		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( img );
 				YOLOSAHIRunner runner = new YOLOSAHIRunner(
 						params,
 						envName,
