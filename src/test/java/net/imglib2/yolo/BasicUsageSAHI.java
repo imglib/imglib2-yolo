@@ -19,7 +19,7 @@ import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
-public class BasicUsage
+public class BasicUsageSAHI
 {
 	public static void main( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
@@ -35,12 +35,12 @@ public class BasicUsage
 
 	public static void basicUsage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
-		final String sampleImagePath = "samples/clown.jpg";
+		final String sampleImagePath = "http://imagej.net/images/clown.jpg" ;
 //		String sampleImagePath = "samples/cycling001-1024x683.jpg";
 
 		// Demo preparation. We use IJ for this one.
 		ImageJ.main( args );
-		final ImagePlus imp = IJ.openImage( "http://imagej.net/images/clown.jpg" );
+		final ImagePlus imp = IJ.openImage( sampleImagePath );
 		imp.show();
 		final Img< ARGBType > img = ImageJFunctions.wrap( imp );
 
@@ -51,10 +51,13 @@ public class BasicUsage
 		final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 		// Specify the parameters for YOLO
-		final YOLOParameters params = new YOLOParameters();
+		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
+				.builtinModel( YOLOBuiltinModels.YOLO26L )
+				.useSahi( true )
+				.build();
 
 		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
-		final List< List< YOLOResult > > output = YOLOMain.detect( rgb, params, listener );
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

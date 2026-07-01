@@ -18,6 +18,7 @@ import org.apposed.appose.Service.TaskStatus;
 import org.apposed.appose.TaskException;
 
 import net.imglib2.appose.ShmImg;
+import net.imglib2.cellpose.Cellpose;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
@@ -141,12 +142,14 @@ public class YOLOSAHIRunner implements AutoCloseable
 		final String utilsScript = IOUtils.toString(
 				YOLOSAHIRunner.class.getResource( UTILS_SCRIPT_PATH ),
 				StandardCharsets.UTF_8 );
+		
 		this.python = env.activate(envName).python().init( utilsScript );
 
 		// Run the model init script (loads YOLO via SAHI, exports 'model').
 		final String yoloInitScript = IOUtils.toString(
 				YOLOSAHIRunner.class.getResource( INIT_SCRIPT_PATH ),
 				StandardCharsets.UTF_8 );
+		
 		final Task task = python.task( yoloInitScript, inputsParams );
 
 		final long start = System.currentTimeMillis();

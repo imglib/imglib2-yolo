@@ -30,7 +30,7 @@ public class YOLORunner implements AutoCloseable
 
 	private static final String RUN_SCRIPT_PATH = "/yolo.py";
 	
-	private static final String IMPORT_PATH = "/yolo_imports.py";  // all imports that depend on numpy, for initialization on windows
+	private static final String IMPORT_PATH = "/yolo_utils.py";  // all imports that depend on numpy, for initialization on windows
 
 	private static final String PIXI_TOML_PATH = "/pixi_yolo.toml";
 

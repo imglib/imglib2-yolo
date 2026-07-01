@@ -20,11 +20,11 @@ else:
 if appose_mode:
     model_file: str = globals()['model_file']
 
-task.update(message = f"YOLO-v26: Loading model '{model_file}'")
+task.update(message = f"YOLO: Loading model '{model_file}'")
 
-model = YOLO( model_file )
+model = YOLO().load( model_file )
 
-task.update(message = "YOLO-v26: Model ready")
+task.update(message = "YOLO: Model ready")
 
 if appose_mode:
-    task.export( model=detection_model )
+    task.export( model=model )

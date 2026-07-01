@@ -72,6 +72,29 @@ public class YOLOMain
 			return runner.run();
 		}
 	}
+	
+	public static List< List< YOLOResult > > detect(
+			final RandomAccessibleInterval< UnsignedByteType > img,
+			final YOLOParameters params,
+			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
+	{
+		if ( img.numDimensions() > 4 || img.numDimensions() < 3 )
+			throw new IllegalArgumentException( "The input image must have at least 3 dimensions." );
+		if ( img.dimension( img.numDimensions() - 1 ) != 3 )
+			throw new IllegalArgumentException( "The last dimension of the input image must be [W, H, 3] or [N, W, H, 3]." );
+
+		final String envName = getEnvName( params.useGpu );
+		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( img );
+				YOLORunner runner = new YOLORunner(
+						params,
+						envName,
+						listener,
+						input ))
+		{
+			runner.init();
+			return runner.run();
+		}
+	}
 
 	/**
 	 * Creates a YOLO runner for repeated inference calls with the same
@@ -108,6 +131,19 @@ public class YOLOMain
 	{
 		final String envName = getEnvName( params.useGpu );
 		return new YOLOSAHIRunner(
+				params,
+				envName,
+				listener,
+				input );
+	}
+	
+	public static YOLORunner yoloRunner(
+			final YOLOParameters params,
+			final ApposeTaskListener listener,
+			final ShmImg< UnsignedByteType > input )
+	{
+		final String envName = getEnvName( params.useGpu );
+		return new YOLORunner(
 				params,
 				envName,
 				listener,

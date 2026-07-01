@@ -35,49 +35,6 @@ def predictions_to_table(predictions: list, plane_index: int = 0) -> list[dict]:
 
 
 ###############################################################################
-# INFERENCE
-###############################################################################
-
-def run_yolo_sahi(stack: np.ndarray, model, kwargs: dict) -> list:
-
-	# Override confidence threshold for this run
-	model.confidence_threshold = kwargs['conf']
-	use_sahi = kwargs['use_sahi']
-	msg_prefix = "YOLO-SAHI: "
-	results = []
-	n_planes = 1 if stack.ndim == 3 else stack.shape[0]
-
-	if use_sahi:
-		task.update(message=f"{msg_prefix}Running YOLO-SAHI detection on image of shape {stack.shape}")
-		for i in range(n_planes):
-			plane = stack[i] if n_planes > 1 else stack
-			result = get_sliced_prediction(
-				image                       = plane,
-				detection_model             = model,
-				slice_height                = kwargs['slice_height'],
-				slice_width                 = kwargs['slice_width'],
-				overlap_height_ratio        = kwargs['overlap_height_ratio'],
-				overlap_width_ratio         = kwargs['overlap_width_ratio'],
-				verbose                     = 0,
-			)
-			results.append(predictions_to_table(result.object_prediction_list))
-			task.update(current=i+1, maximum = n_planes)
-	else:
-		task.update(message=f"{msg_prefix}Running standard YOLO detection on image of shape {stack.shape}")
-		for i in range(n_planes):
-			plane = stack[i] if n_planes > 1 else stack
-			result = get_prediction(
-				image=plane,
-				detection_model=model,
-				verbose=0,
-			)
-			results.append(predictions_to_table(result.object_prediction_list))
-			task.update(current=i+1, maximum = n_planes)
-	
-	return results
-
-
-###############################################################################
 # MAIN
 ###############################################################################
 
@@ -95,26 +52,16 @@ else:
 
 # ── Load parameters ───────────────────────────────────────────────────────────
 if appose_mode:
-	source_image  = globals()['input'].ndarray()
-	conf: float   = globals()['conf']
-	use_sahi: bool                  = globals()['use_sahi']
-	slice_height: int               = globals()['slice_height']
-	slice_width: int                = globals()['slice_width']
-	overlap_height_ratio: float     = globals()['overlap_height_ratio']
-	overlap_width_ratio: float      = globals()['overlap_width_ratio']
-	min_area: int                   = globals()['min_area']
-	use_gpu: bool                   = globals()['use_gpu']
+    source_image  = globals()['input'].ndarray()
+    conf: float   = globals()['conf']
+    imgsz: int    = globals()['imgsz']
+    min_area: int                   = globals()['min_area']
+    use_gpu: bool                   = globals()['use_gpu']
 else:
-	from sahi.utils.cv import read_image
 	import os
 	sample_folder = '../../../samples/'
-	source_image  = io.imread(os.path.join(sample_folder, 'cycling001-1024x683.jpg'))
+	#source_image  = io.imread(os.path.join(sample_folder, 'cycling001-1024x683.jpg'))
 	conf          = 0.25
-	use_sahi      = True
-	slice_height  = 640
-	slice_width   = 640
-	overlap_height_ratio  = 0.2
-	overlap_width_ratio   = 0.2
 	min_area      = 0
 	use_gpu       = False
 
@@ -130,16 +77,13 @@ if model is None:
 	)
 
 # Check image dimensions
-msg_prefix = "YOLO-SAHI: "
+msg_prefix = "YOLO: "
 task.update(message=f"{msg_prefix}Input image shape {source_image.shape}")
 
+
 kwargs = dict(
-	conf                        = conf,
-	use_sahi                    = use_sahi,
-	slice_height                = slice_height,
-	slice_width                 = slice_width,
-	overlap_height_ratio        = overlap_height_ratio,
-	overlap_width_ratio         = overlap_width_ratio,
+	conf  = conf,
+    imgsz = imgsz,
 )
 
 # Only 1 plane -> ndims is 3, otherwise 4 [3, N, H, W]
@@ -150,7 +94,7 @@ task.update( message=f"{msg_prefix}Input image has {n_planes} plane" + "s" if n_
 source_image = np.moveaxis(source_image, 0, -1)
 task.update( message=f"{msg_prefix}Image shape after moveaxis: {source_image.shape}")
 
-all_detections = run_yolo_sahi(source_image, model, kwargs)
+all_detections = model.predict( source_image, kwargs )
 all_detections = filter_by_area(all_detections, min_area)
 
 task.update( message = f"{msg_prefix}Done – {sum(len(p) for p in all_detections)} total detections")
