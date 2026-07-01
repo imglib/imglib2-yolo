@@ -52,7 +52,7 @@ public class TestGrayscale
 				.build();
 
 		final RandomAccessibleInterval< UnsignedByteType > input = YOLOImgUtils.rescale( img );
-		final List< List< YOLOResult > > output = YOLO.sahiDetect( input, params, listener );
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( input, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		BasicUsage.showOutput( output, stack );
@@ -80,7 +80,7 @@ public class TestGrayscale
 				.build();
 
 		final RandomAccessibleInterval< UnsignedByteType > input = YOLOImgUtils.rescale( img );
-		final List< List< YOLOResult > > output = YOLO.sahiDetect( input, params, listener );
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( input, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		BasicUsage.showOutput( output, imp );

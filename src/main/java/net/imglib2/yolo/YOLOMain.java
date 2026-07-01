@@ -15,7 +15,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
  * Appose to manage Python environments and processes, and using ImgLib2 data
  * structures as input.
  */
-public class YOLO
+public class YOLOMain
 {
 
 	/**
@@ -137,6 +137,6 @@ public class YOLO
 		}
 	}
 
-	private YOLO()
+	private YOLOMain()
 	{}
 }

@@ -57,7 +57,7 @@ public class BasicUsage
 				.build();
 
 		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
-		final List< List< YOLOResult > > output = YOLO.sahiDetect( rgb, params, listener );
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

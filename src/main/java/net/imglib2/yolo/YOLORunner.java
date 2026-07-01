@@ -21,18 +21,18 @@ import net.imglib2.appose.ShmImg;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
- * Runs YOLO detection with SAHI slicing via Appose.
+ * Runs YOLO v26 detection slicing via Appose.
  */
-public class YOLOSAHIRunner implements AutoCloseable
+public class YOLORunner implements AutoCloseable
 {
 
-	private static final String INIT_SCRIPT_PATH = "/yolo_sahi_init.py";
+	private static final String INIT_SCRIPT_PATH = "/yolo_init.py";
 
-	private static final String RUN_SCRIPT_PATH = "/yolo_sahi.py";
+	private static final String RUN_SCRIPT_PATH = "/yolo.py";
+	
+	private static final String IMPORT_PATH = "/yolo_imports.py";  // all imports that depend on numpy, for initialization on windows
 
-	private static final String UTILS_SCRIPT_PATH = "/yolo_utils.py";
-
-	private static final String PIXI_TOML_PATH = "/pixi_sahi.toml";
+	private static final String PIXI_TOML_PATH = "/pixi_yolo.toml";
 
 	private final String envName;
 
@@ -45,10 +45,10 @@ public class YOLOSAHIRunner implements AutoCloseable
 	private String yoloScript;
 
 	/**
-	 * Instantiates a YOLO-SAHI runner.
+	 * Instantiates a YOLO-Img runner.
 	 *
 	 * @param params
-	 *            the YOLO-SAHI parameters.
+	 *            the YOLO-Img parameters.
 	 * @param envName
 	 *            the pixi environment name to use ({@code yolo-gpu} or
 	 *            {@code yolo-cpu}).
@@ -63,8 +63,8 @@ public class YOLOSAHIRunner implements AutoCloseable
 	 *            [N, W, H, 3] for a stack of N images. Everything else will
 	 *            fail with an exception at the Python level.
 	 */
-	YOLOSAHIRunner(
-			final YOLOSAHIParameters params,
+	YOLORunner(
+			final YOLOParameters params,
 			final String envName,
 			final ApposeTaskListener listener,
 			final ShmImg< UnsignedByteType > input )
@@ -101,7 +101,7 @@ public class YOLOSAHIRunner implements AutoCloseable
 			throw new RuntimeException( "Python script failed with error: " + task.error );
 
 		final long end = System.currentTimeMillis();
-		listener.message( "YOLO-SAHI inference done in " + ( end - start ) / 1000. + " s" );
+		listener.message( "YOLO inference done in " + ( end - start ) / 1000. + " s" );
 
 		// Detections are returned via task.export( detections=... ) in Python.
 		// Returns a list of lists: one list per plane.
@@ -138,14 +138,14 @@ public class YOLOSAHIRunner implements AutoCloseable
 				.build();
 
 		// Start the Python worker, pre-loading the shared utility module.
-		final String utilsScript = IOUtils.toString(
-				YOLOSAHIRunner.class.getResource( UTILS_SCRIPT_PATH ),
+		final String initScript = IOUtils.toString(
+				YOLORunner.class.getResource( IMPORT_PATH ),
 				StandardCharsets.UTF_8 );
-		this.python = env.activate(envName).python().init( utilsScript );
+		this.python = env.activate(envName).python().init( initScript );
 
-		// Run the model init script (loads YOLO via SAHI, exports 'model').
+		// Run the model init script (loads YOLO, exports 'model').
 		final String yoloInitScript = IOUtils.toString(
-				YOLOSAHIRunner.class.getResource( INIT_SCRIPT_PATH ),
+				YOLORunner.class.getResource( INIT_SCRIPT_PATH ),
 				StandardCharsets.UTF_8 );
 		final Task task = python.task( yoloInitScript, inputsParams );
 
@@ -158,11 +158,11 @@ public class YOLOSAHIRunner implements AutoCloseable
 			throw new RuntimeException( "Python init script failed with error: " + task.error );
 
 		final long end = System.currentTimeMillis();
-		listener.message( "YOLO-SAHI: Initialisation done in " + ( end - start ) / 1000. + " s" );
+		listener.message( "YOLO: Initialisation done in " + ( end - start ) / 1000. + " s" );
 
 		// Cache the inference script for repeated run() calls.
 		this.yoloScript = IOUtils.toString(
-				YOLOSAHIRunner.class.getResource( RUN_SCRIPT_PATH ),
+				YOLORunner.class.getResource( RUN_SCRIPT_PATH ),
 				StandardCharsets.UTF_8 );
 	}
 
@@ -181,7 +181,7 @@ public class YOLOSAHIRunner implements AutoCloseable
 	 */
 	public static String pixiEnv() throws IOException
 	{
-		final URL pixiFile = YOLOSAHIRunner.class.getResource( PIXI_TOML_PATH );
+		final URL pixiFile = YOLORunner.class.getResource( PIXI_TOML_PATH );
 		return IOUtils.toString( pixiFile, StandardCharsets.UTF_8 );
 	}
 

@@ -1,0 +1,26 @@
+[workspace]
+authors = [
+    "Jean-Yves Tinevez <tinevez@pasteur.fr>",
+	"Gaelle Letort",
+]
+channels = ["conda-forge"]
+name = "yolo-appose"
+platforms = ["osx-arm64", "win-64", "linux-64", "osx-64"]
+version = "0.1.0"
+
+[dependencies]
+python = ">=3.10.3,<3.14"
+packaging = ">=26.2,<27"
+wheel = "*"
+hatchling = "*"
+cmake = "*"
+
+[pypi-dependencies]
+appose = ">=0.10.1, <0.13"
+
+[feature.yolo.pypi-dependencies]
+ultralytics = ">=8.3, <9"
+
+# --- Environments ---
+[environments]
+default  = { features = ["yolo"] }
