@@ -30,7 +30,7 @@ public abstract class YOLOMainParameters
     {
     	this.builtinModel           = YOLOBuiltinModels.YOLO26N;
     	this.customModel                       = null;
-    	this.conf                              = 0.25;
+    	this.conf                              = 0.1;
     	this.minArea                           = 0;
     	this.useGpu                           = true;
     }

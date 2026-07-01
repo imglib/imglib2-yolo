@@ -12,7 +12,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 public class YOLOParameters extends YOLOMainParameters
 {
-	private double scale; // scaling of the image to determine imgsz
+	public double scale; // scaling of the image to determine imgsz
 	
 	public YOLOParameters(
 			final YOLOBuiltinModels builtInModel,
