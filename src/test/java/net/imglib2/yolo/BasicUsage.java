@@ -52,7 +52,7 @@ public class BasicUsage
 
 		// Specify the parameters for YOLO
 		final YOLOParameters params = new YOLOParameters();
-		params.scale = 1;
+		params.scale = 0.5;
 
 		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
 		final List< List< YOLOResult > > output = YOLOMain.detect( rgb, params, listener );
