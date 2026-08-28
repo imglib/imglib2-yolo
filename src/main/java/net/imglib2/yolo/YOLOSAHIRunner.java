@@ -18,7 +18,7 @@ import org.apposed.appose.Service.TaskStatus;
 import org.apposed.appose.TaskException;
 
 import net.imglib2.appose.ShmImg;
-import net.imglib2.cellpose.Cellpose;
+//import net.imglib2.cellpose.Cellpose;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
 /**
