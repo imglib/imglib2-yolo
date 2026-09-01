@@ -15,7 +15,7 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
  * Appose to manage Python environments and processes, and using ImgLib2 data
  * structures as input.
  */
-public class YOLO
+public class YOLOMain
 {
 
 	/**
@@ -72,6 +72,29 @@ public class YOLO
 			return runner.run();
 		}
 	}
+	
+	public static List< List< YOLOResult > > detect(
+			final RandomAccessibleInterval< UnsignedByteType > img,
+			final YOLOParameters params,
+			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
+	{
+		if ( img.numDimensions() > 4 || img.numDimensions() < 3 )
+			throw new IllegalArgumentException( "The input image must have at least 3 dimensions." );
+		if ( img.dimension( img.numDimensions() - 1 ) != 3 )
+			throw new IllegalArgumentException( "The last dimension of the input image must be [W, H, 3] or [N, W, H, 3]." );
+
+		final String envName = getEnvName( params.useGpu );
+		try (final ShmImg< UnsignedByteType > input = ShmImg.copyOf( img );
+				YOLORunner runner = new YOLORunner(
+						params,
+						envName,
+						listener,
+						input ))
+		{
+			runner.init();
+			return runner.run();
+		}
+	}
 
 	/**
 	 * Creates a YOLO runner for repeated inference calls with the same
@@ -113,6 +136,19 @@ public class YOLO
 				listener,
 				input );
 	}
+	
+	public static YOLORunner yoloRunner(
+			final YOLOParameters params,
+			final ApposeTaskListener listener,
+			final ShmImg< UnsignedByteType > input )
+	{
+		final String envName = getEnvName( params.useGpu );
+		return new YOLORunner(
+				params,
+				envName,
+				listener,
+				input );
+	}
 
 	private static String getEnvName( final boolean useGpu )
 	{
@@ -137,6 +173,6 @@ public class YOLO
 		}
 	}
 
-	private YOLO()
+	private YOLOMain()
 	{}
 }
