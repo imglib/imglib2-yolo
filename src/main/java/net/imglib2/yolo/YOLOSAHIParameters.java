@@ -23,7 +23,6 @@ public class YOLOSAHIParameters extends YOLOMainParameters
 	public YOLOSAHIParameters(
 			final YOLOBuiltinModels builtInModel,
 			final String customModel,
-			final double scale,
 			final double conf,
 			final int minArea,
 			final boolean useGpu,
@@ -33,7 +32,7 @@ public class YOLOSAHIParameters extends YOLOMainParameters
 			final double overlapWidthRatio
 		)
 	{
-		super( builtInModel, customModel, scale, conf, minArea, useGpu );
+		super( builtInModel, customModel, conf, minArea, useGpu );
 		this.sliceHeight = sliceHeight;
 		this.sliceWidth = sliceWidth;
 		this.overlapHeightRatio = overlapHeightRatio;

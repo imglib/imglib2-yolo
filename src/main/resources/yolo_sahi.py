@@ -98,7 +98,6 @@ else:
 # ── Load parameters ───────────────────────────────────────────────────────────
 if appose_mode:
     source_image  = globals()['input'].ndarray()
-    imgsz = globals()['imgsz']
     conf: float   = globals()['conf']
     slice_height: int               = globals()['slice_height']
     slice_width: int                = globals()['slice_width']
@@ -114,7 +113,6 @@ else:
     conf          = 0.25
     slice_height  = 640
     slice_width   = 640
-    imgsz = 640
     overlap_height_ratio  = 0.2
     overlap_width_ratio   = 0.2
     min_area      = 0
@@ -136,7 +134,6 @@ msg_prefix = "YOLO-SAHI: "
 task.update(message=f"{msg_prefix}Input image shape {source_image.shape}")
 
 kwargs = dict(
-    imgsz = imgsz,
 	conf                        = conf,
 	slice_height                = slice_height,
 	slice_width                 = slice_width,
