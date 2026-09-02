@@ -54,9 +54,9 @@ public class YOLOParameters extends YOLOMainParameters
 	}
 	
 	@Override
-	public < T extends RealType< T > & NativeType< T > > Map< String, Object > toApposeMap( final ShmImg< T > input )
+	public < T extends RealType< T > & NativeType< T > > Map< String, Object > toApposeMap( final ShmImg< T > input, final AxisInfo axisInfo )
     {
-		final Map< String, Object > inputs = super.toApposeMap( input );
+		final Map< String, Object > inputs = super.toApposeMap( input, axisInfo );
 		final boolean isBuiltInModel = customModel == null || customModel.equals( "" );
 		
 		final int imgsz = calculate_imgsz( (int) input.dimension(0), (int) input.dimension(1) ); // checker that dimensions are width and height 

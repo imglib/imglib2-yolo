@@ -25,7 +25,7 @@ import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.type.numeric.real.DoubleType;
 
-public class BasicUsage
+public class BasicUsageGreyImage
 {
 	public static void main( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
@@ -41,30 +41,25 @@ public class BasicUsage
 
 	public static void basicUsage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
-		final String sampleImagePath = "samples/clown.jpg";
-//		String sampleImagePath = "samples/cycling001-1024x683.jpg";
-
 		// Demo preparation. We use IJ for this one.
 		ImageJ.main( args );
-		final ImagePlus imp = IJ.openImage( "http://imagej.net/images/clown.jpg" );
+		final ImagePlus imp = IJ.openImage( "http://imagej.net/images/blobs.gif" );
 		imp.show();
-		final Img< ARGBType > img = ImageJFunctions.wrap( imp );
+		final Img< UnsignedByteType > img = ImageJFunctions.wrap( imp );
 		AxisInfo axisInfo = getAxisInfo( imp );  // get the axes information
 		System.out.println(axisInfo.toString());
 		
-		// Input
-		final RandomAccessibleInterval< ARGBType > input = img;
-
 		// Get messages about installing and processing
 		final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 		// Specify the parameters for YOLO
 		final YOLOParameters params = new YOLOParameters();
-		params.scale = 0.5;
+		params.scale = 0.25;
 
-		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
-		axisInfo = axisInfo.insertChannelDim(rgb.numDimensions()-1);
-		final List< List< YOLOResult > > output = YOLOMain.detect( rgb, axisInfo, params, listener );
+		final RandomAccessibleInterval< UnsignedByteType > input = YOLOImgUtils.singleChannelToRGBStack( img );
+		axisInfo = axisInfo.insertChannelDim(input.numDimensions()-1);
+		
+		final List< List< YOLOResult > > output = YOLOMain.detect( input, axisInfo, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

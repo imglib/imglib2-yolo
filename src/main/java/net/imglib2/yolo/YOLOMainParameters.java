@@ -60,12 +60,18 @@ public abstract class YOLOMainParameters
      * Detections are returned via task.export() on the Python side,
      * so no output shared-memory image is needed.
      */
-	public < T extends RealType< T > & NativeType< T > > Map< String, Object > toApposeMap( final ShmImg< T > input )
+	public < T extends RealType< T > & NativeType< T > > Map< String, Object > toApposeMap( final ShmImg< T > input, final AxisInfo axisInfo )
     {
         final Map< String, Object > inputs = new HashMap<>();
 
         // ── Input image ───────────────────────────────────────────────────────
         inputs.put( "input", input.ndArray() );
+        
+        // Axis position, if there are channels, time or Z
+    	final AxisInfo axisInfoPython = axisInfo.toPython();
+		inputs.put( "t_axis", axisInfoPython.T() < 0 ? null : axisInfoPython.T() );
+		inputs.put( "z_axis", axisInfoPython.Z() < 0 ? null : axisInfoPython.Z() );
+		inputs.put( "channel_axis", axisInfoPython.C() < 0 ? null : axisInfoPython.C() );
 
         // ── Model ─────────────────────────────────────────────────────────────
         final boolean useCustom = customModel != null && !customModel.isBlank();

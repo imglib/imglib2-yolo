@@ -84,14 +84,22 @@ if model is None:
 
 # Check image dimensions
 msg_prefix = "YOLO: "
+
 task.update(message=f"{msg_prefix}Input image shape {source_image.shape} with size {imgsz}")
 
 # Only 1 plane -> ndims is 3, otherwise 4 [3, N, H, W]
-n_planes = 1 if source_image.ndim == 3 else source_image.shape[1]
+## Check how to handle the T and Z: frame by frame a priori
+n_planes = 1
+if t_axis is not None:
+    n_planes = n_planes*t_axis
+if z_axis is not None:
+    n_planes = n_planes*z_axis
+
 task.update( message=f"{msg_prefix}Input image has {n_planes} plane" + "s" if n_planes > 1 else "")
 
-# Convert to [ N, H, W, 3 ] or [ H, W, 3 ] 
-source_image = np.moveaxis(source_image, 0, -1)
+# Ensure the channel axis is the last dimension. Maybe should also split by planes if there are time or Z 
+if channel_axis < (source_image.ndim-1):
+    source_image = np.moveaxis(source_image, channel_axis, -1)
 task.update( message=f"{msg_prefix}Image shape after moveaxis: {source_image.shape}")
 
 all_detections = model.predict( source_image, conf=conf, imgsz=imgsz, save=False )
