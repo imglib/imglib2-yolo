@@ -40,49 +40,22 @@ public class TestGrayscale
 		final ImagePlus stack = FolderOpener.open( "samples/", 640, 480, "filter=" + filter );
 		stack.show();
 
+		AxisInfo axisInfo = UtilsForTest.getAxisInfo( stack );  // get the axes information
 		final Img< T > img = ImageJFunctions.wrap( stack );
 
 		// Get messages about installing and processing
 		final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 		// Specify the parameters for YOLO
-		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-				.builtinModel( YOLOBuiltinModels.YOLO26L )
-				.useSahi( true )
-				.build();
-
+		final YOLOSAHIParameters params = new YOLOSAHIParameters();
+		params.builtinModel = YOLOBuiltinModels.YOLO26L;
+				
 		final RandomAccessibleInterval< UnsignedByteType > input = YOLOImgUtils.rescale( img );
-		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( input, params, listener );
+		axisInfo = axisInfo.insertChannelDim(input.numDimensions()-1);
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( input, axisInfo, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		BasicUsage.showOutput( output, stack );
 	}
 
-	public static < T extends RealType< T > & NativeType< T > > void singleImage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
-	{
-//		final String sampleImagePath = "samples/donut-bw-8bit.tif";
-//		final String sampleImagePath = "samples/donut-bw-16bit-8bit-range.tif";
-		final String sampleImagePath = "samples/donut-bw-16bit-16bit-range.tif";
-
-		// Demo preparation. We use IJ for this one.
-		ImageJ.main( args );
-		final ImagePlus imp = IJ.openImage( sampleImagePath );
-		imp.show();
-		final Img< T > img = ImageJFunctions.wrap( imp );
-
-		// Get messages about installing and processing
-		final ApposeTaskListener listener = ApposeTaskListener.STD;
-
-		// Specify the parameters for YOLO
-		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-				.builtinModel( YOLOBuiltinModels.YOLO26L )
-				.useSahi( true )
-				.build();
-
-		final RandomAccessibleInterval< UnsignedByteType > input = YOLOImgUtils.rescale( img );
-		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( input, params, listener );
-		final int totalObjects = output.stream().mapToInt( List::size ).sum();
-		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
-		BasicUsage.showOutput( output, imp );
-	}
 }

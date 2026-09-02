@@ -35,7 +35,7 @@ public class BasicUsageSAHI
 
 	public static void basicUsage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
-		final String sampleImagePath = "http://imagej.net/images/boats.gif" ;
+		final String sampleImagePath = "http://imagej.net/images/clown.jpg" ;
 //		String sampleImagePath = "samples/cycling001-1024x683.jpg";
 
 		// Demo preparation. We use IJ for this one.

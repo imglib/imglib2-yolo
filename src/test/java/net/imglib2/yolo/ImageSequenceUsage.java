@@ -22,6 +22,7 @@ public class ImageSequenceUsage
 			final int n = 128; // to open
 			final ImagePlus stack = FolderOpener.open( "samples/coco128/images/train2017", 640, 480, "count=" + n );
 			stack.show();
+			AxisInfo axisInfo = UtilsForTest.getAxisInfo( stack );  // get the axes information
 
 			final Img< ARGBType > img = ImageJFunctions.wrap( stack );
 
@@ -29,13 +30,12 @@ public class ImageSequenceUsage
 			final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 			// Specify the parameters for YOLO
-			final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-					.builtinModel( YOLOBuiltinModels.YOLO26L )
-					.useSahi( false )
-					.build();
-
+			final YOLOSAHIParameters params = new YOLOSAHIParameters();
+			params.builtinModel = YOLOBuiltinModels.YOLO26L;
+					
 			final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( img );
-			final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, params, listener );
+			axisInfo = axisInfo.insertChannelDim(rgb.numDimensions()-1);
+			final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, axisInfo, params, listener );
 			final int totalObjects = output.stream().mapToInt( List::size ).sum();
 			System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 			BasicUsage.showOutput( output, stack );
