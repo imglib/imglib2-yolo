@@ -3,6 +3,7 @@ package net.imglib2.yolo;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import net.imglib2.FinalInterval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.converter.Converters;
@@ -118,6 +119,23 @@ public class YOLOImgUtils
 				new UnsignedByteType() );
 		return Views.stack( converted, converted, converted );
 	}
+	
+	public static < T extends RealType< T > > RandomAccessibleInterval< UnsignedByteType > mergeChannelsToRGBStack( final RandomAccessibleInterval< T > channel0, final RandomAccessibleInterval< T > channel1, final RandomAccessibleInterval< T > channel2 )
+	{
+		final RandomAccessibleInterval< UnsignedByteType > converted0 = Converters.convert(
+				channel0,
+				( in, out ) -> out.set( Math.min( 255, Math.max( 0, ( int ) in.getRealDouble() ) ) ),
+				new UnsignedByteType() );
+		final RandomAccessibleInterval< UnsignedByteType > converted1 = Converters.convert(
+				channel1,
+				( in, out ) -> out.set( Math.min( 255, Math.max( 0, ( int ) in.getRealDouble() ) ) ),
+				new UnsignedByteType() );
+		final RandomAccessibleInterval< UnsignedByteType > converted2 = Converters.convert(
+				channel2,
+				( in, out ) -> out.set( Math.min( 255, Math.max( 0, ( int ) in.getRealDouble() ) ) ),
+				new UnsignedByteType() );
+		return Views.stack( converted0, converted1, converted2 );
+	}
 
 	/**
 	 * Rescales a single-channel image to the 0-255 range and converts it to a
@@ -179,4 +197,7 @@ public class YOLOImgUtils
 		}
 		return new double[] { min, max };
 	}
+	
+
+
 }

@@ -46,7 +46,7 @@ public class BasicUsageGreyImage
 		final ImagePlus imp = IJ.openImage( "http://imagej.net/images/blobs.gif" );
 		imp.show();
 		final Img< UnsignedByteType > img = ImageJFunctions.wrap( imp );
-		AxisInfo axisInfo = getAxisInfo( imp );  // get the axes information
+		AxisInfo axisInfo = UtilsForTest.getAxisInfo( imp );  // get the axes information
 		System.out.println(axisInfo.toString());
 		
 		// Get messages about installing and processing
@@ -65,16 +65,6 @@ public class BasicUsageGreyImage
 		showOutput( output, imp );
 	}
 	
-	static AxisInfo getAxisInfo( final ImagePlus imp )
-	{
-		final ImgPlus<?> img = ImagePlusAdapter.wrapImgPlus( imp );
-		final int x = img.dimensionIndex( Axes.X );
-		final int y = img.dimensionIndex( Axes.Y );
-		final int c = img.dimensionIndex( Axes.CHANNEL );
-		final int z = img.dimensionIndex( Axes.Z );
-		final int t = img.dimensionIndex( Axes.TIME );
-		return new AxisInfo( x, y, c, z, t );
-	}
 
 	static void showOutput( final List< List< YOLOResult > > output, final ImagePlus imp )
 	{

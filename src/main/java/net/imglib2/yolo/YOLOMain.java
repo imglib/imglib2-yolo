@@ -10,6 +10,7 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.appose.ShmImg;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
 
+
 /**
  * Main class to run YOLO detection with optional SAHI slicing from Java, using
  * Appose to manage Python environments and processes, and using ImgLib2 data
@@ -52,6 +53,7 @@ public class YOLOMain
 	 */
 	public static List< List< YOLOResult > > sahiDetect(
 			final RandomAccessibleInterval< UnsignedByteType > img,
+			final AxisInfo axisInfo,
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener ) throws BuildException, IOException, InterruptedException, TaskException
 	{
@@ -66,7 +68,9 @@ public class YOLOMain
 						params,
 						envName,
 						listener,
-						input ))
+						input,
+						axisInfo
+						))
 		{
 			runner.init();
 			return runner.run();
@@ -129,14 +133,18 @@ public class YOLOMain
 	public static YOLOSAHIRunner yoloSAHIRunner(
 			final YOLOSAHIParameters params,
 			final ApposeTaskListener listener,
-			final ShmImg< UnsignedByteType > input )
+			final ShmImg< UnsignedByteType > input,
+			final AxisInfo axisInfo
+			)
 	{
 		final String envName = getEnvName( params.useGpu );
 		return new YOLOSAHIRunner(
 				params,
 				envName,
 				listener,
-				input );
+				input,
+				axisInfo
+				);
 	}
 	
 	public static YOLORunner yoloRunner(

@@ -68,11 +68,13 @@ public class YOLOSAHIRunner implements AutoCloseable
 			final YOLOSAHIParameters params,
 			final String envName,
 			final ApposeTaskListener listener,
-			final ShmImg< UnsignedByteType > input )
+			final ShmImg< UnsignedByteType > input,
+			final AxisInfo axisInfo
+			)
 	{
 		this.envName = envName;
 		this.listener = listener;
-		this.inputsParams = params.toApposeMap( input );
+		this.inputsParams = params.toApposeMap( input, axisInfo );
 	}
 
 	/**

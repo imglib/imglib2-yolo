@@ -35,7 +35,7 @@ public class BasicUsageSAHI
 
 	public static void basicUsage( final String[] args ) throws BuildException, IOException, InterruptedException, TaskException
 	{
-		final String sampleImagePath = "http://imagej.net/images/clown.jpg" ;
+		final String sampleImagePath = "http://imagej.net/images/boats.gif" ;
 //		String sampleImagePath = "samples/cycling001-1024x683.jpg";
 
 		// Demo preparation. We use IJ for this one.
@@ -45,19 +45,19 @@ public class BasicUsageSAHI
 		final Img< ARGBType > img = ImageJFunctions.wrap( imp );
 
 		// Input
+		AxisInfo axisInfo = UtilsForTest.getAxisInfo( imp );  // get the axes information
 		final RandomAccessibleInterval< ARGBType > input = img;
 
 		// Get messages about installing and processing
 		final ApposeTaskListener listener = ApposeTaskListener.STD;
 
 		// Specify the parameters for YOLO
-		final YOLOSAHIParameters params = YOLOSAHIParameters.builder()
-				.builtinModel( YOLOBuiltinModels.YOLO26L )
-				.useSahi( true )
-				.build();
-
+		final YOLOSAHIParameters params = new YOLOSAHIParameters();
+		params.builtinModel = YOLOBuiltinModels.YOLO26S;
+		
 		final RandomAccessibleInterval< UnsignedByteType > rgb = YOLOImgUtils.argbToRGBStack( input );
-		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, params, listener );
+		axisInfo = axisInfo.insertChannelDim(rgb.numDimensions()-1);
+		final List< List< YOLOResult > > output = YOLOMain.sahiDetect( rgb, axisInfo, params, listener );
 		final int totalObjects = output.stream().mapToInt( List::size ).sum();
 		System.out.println( "Detected " + totalObjects + " objects in " + output.size() + " plane(s)" );
 		showOutput( output, imp );

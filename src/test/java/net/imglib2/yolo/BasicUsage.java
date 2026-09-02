@@ -13,17 +13,12 @@ import ij.ImagePlus;
 import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.gui.TextRoi;
-import net.imagej.ImgPlus;
-import net.imagej.axis.Axes;
-import net.imagej.axis.CalibratedAxis;
-import net.imagej.space.TypedSpace;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.ARGBType;
 import net.imglib2.type.numeric.integer.UnsignedByteType;
-import net.imglib2.type.numeric.real.DoubleType;
+
 
 public class BasicUsage
 {
@@ -49,7 +44,7 @@ public class BasicUsage
 		final ImagePlus imp = IJ.openImage( "http://imagej.net/images/clown.jpg" );
 		imp.show();
 		final Img< ARGBType > img = ImageJFunctions.wrap( imp );
-		AxisInfo axisInfo = getAxisInfo( imp );  // get the axes information
+		AxisInfo axisInfo = UtilsForTest.getAxisInfo( imp );  // get the axes information
 		System.out.println(axisInfo.toString());
 		
 		// Input
@@ -70,16 +65,6 @@ public class BasicUsage
 		showOutput( output, imp );
 	}
 	
-	static AxisInfo getAxisInfo( final ImagePlus imp )
-	{
-		final ImgPlus<?> img = ImagePlusAdapter.wrapImgPlus( imp );
-		final int x = img.dimensionIndex( Axes.X );
-		final int y = img.dimensionIndex( Axes.Y );
-		final int c = img.dimensionIndex( Axes.CHANNEL );
-		final int z = img.dimensionIndex( Axes.Z );
-		final int t = img.dimensionIndex( Axes.TIME );
-		return new AxisInfo( x, y, c, z, t );
-	}
 
 	static void showOutput( final List< List< YOLOResult > > output, final ImagePlus imp )
 	{
