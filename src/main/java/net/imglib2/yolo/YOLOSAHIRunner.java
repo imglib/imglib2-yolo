@@ -27,13 +27,13 @@ import net.imglib2.type.numeric.integer.UnsignedByteType;
 public class YOLOSAHIRunner implements AutoCloseable
 {
 
-	private static final String INIT_SCRIPT_PATH = "/yolo_sahi_init.py";
+	private static final String INIT_SCRIPT_PATH = "yolo_sahi_init.py";
 
-	private static final String RUN_SCRIPT_PATH = "/yolo_sahi.py";
+	private static final String RUN_SCRIPT_PATH = "yolo_sahi.py";
 
-	private static final String UTILS_SCRIPT_PATH = "/yolo_utils.py";
+	private static final String UTILS_SCRIPT_PATH = "yolo_utils.py";
 
-	private static final String PIXI_TOML_PATH = "/pixi_sahi.toml";
+	private static final String PIXI_TOML_PATH = "pixi_sahi.toml";
 
 	private final String envName;
 
